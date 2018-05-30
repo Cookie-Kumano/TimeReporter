@@ -171,16 +171,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void houtivoice() {
-        final Handler handler = new Handler();
-        final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-
-
-
-                handler.postDelayed(this, 3000);
-            }
-        };
-        handler.post(r);
+       new Handler().postDelayed(new Runnable() {
+           @Override
+           public void run() {
+               // 指定されたボイスを再生
+               String message = db.charData.get(charID).message[4];
+               charMessageView.setText(message);
+           }
+       }, 300000);
     }
 }
