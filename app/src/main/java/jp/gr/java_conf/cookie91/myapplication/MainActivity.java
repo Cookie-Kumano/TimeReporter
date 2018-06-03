@@ -1,5 +1,7 @@
 package jp.gr.java_conf.cookie91.myapplication;
 
+import android.app.Dialog;
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,7 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -81,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.setting_button:
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivity(i);
+                break;
+            case R.id.progress_checker:
+                pDialog();
                 break;
             case R.id.char_0:
                 charID = char0_id;
@@ -160,11 +167,11 @@ public class MainActivity extends AppCompatActivity {
         charSelected = sp.getInt("CHARS", 0);
 
         if (timerep.equals("true")) {
-            am.alarmRegister();
+            am.alarmRegister("zihou", 0, 0, "");
 
         }
         else
-            am.stopAlarm();
+            am.stopAlarm("zihou");
         if (houti.equals("true")) {
             houtivoice();
         }
@@ -179,5 +186,38 @@ public class MainActivity extends AppCompatActivity {
                charMessageView.setText(message);
            }
        }, 300000);
+    }
+
+    private void pDialog() {
+        Dialog dialog = new Dialog(getApplicationContext());
+        dialog.setContentView(R.layout.setp_dialog);
+
+        final EditText editComment = (EditText)findViewById(R.id.editComment);
+        final NumberPicker hourPicker = (NumberPicker)findViewById(R.id.hourPicker);
+        final NumberPicker minutePicker = (NumberPicker)findViewById(R.id.minutePicker);
+        Button cancel = (Button)findViewById(R.id.cancel);
+        Button decision = (Button)findViewById(R.id.decision);
+
+        hourPicker.setMaxValue(24);
+        hourPicker.setMinValue(0);
+        minutePicker.setMaxValue(60);
+        minutePicker.setMinValue(0);
+
+        decision.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String userComment = editComment.getText().toString();
+                if (editComment.getText().toString().equals(""))
+                    userComment = "携帯弄ってる暇ある？？？？";
+                am.alarmRegister("sintyoku", hourPicker.getValue(), minutePicker.getValue(), userComment);
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                am.stopAlarm("sintyoku");
+            }
+        });
     }
 }

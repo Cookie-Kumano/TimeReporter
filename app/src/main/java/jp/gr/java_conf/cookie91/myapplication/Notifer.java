@@ -1,6 +1,7 @@
 package jp.gr.java_conf.cookie91.myapplication;
 
 
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -26,58 +27,65 @@ public class Notifer extends BroadcastReceiver {
         Log.w("notif", "aaa");
 
         int time = intent.getIntExtra("time", 0);
+        String status = intent.getStringExtra("status");
 
-        cd = new CharacterData();
-        am = new CAlarmManager(content);
+        if (status.equals("zihou")) {
+            cd = new CharacterData();
+            am = new CAlarmManager(content);
 
-        Random r = new Random();
-        int charID = r.nextInt(cd.timereps.size());
+            Random r = new Random();
+            int charID = r.nextInt(cd.timereps.size());
 
-        String contentText = cd.contentText(time, charID);
+            String contentText = cd.contentText(time, charID);
 
 
-        NotificationManager notif = (NotificationManager) content.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notif = (NotificationManager) content.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("notif", "あああ", NotificationManager.IMPORTANCE_DEFAULT);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel("notif", "あああ", NotificationManager.IMPORTANCE_DEFAULT);
 
-            channel.setLightColor(Color.parseColor("#E91E63"));
+                channel.setLightColor(Color.parseColor("#E91E63"));
 
-            notif.createNotificationChannel(channel);
+                notif.createNotificationChannel(channel);
+            }
+
+            Intent bootIntent = new Intent(content, MainActivity.class);
+            PendingIntent contentIntent = PendingIntent.getActivity(content, 1, bootIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            Notification.Builder builder;
+
+
+            RemoteViews customView = new RemoteViews(content.getPackageName(), R.layout.notiflayout);
+            customView.setTextViewText(R.id.messageView, contentText);
+            customView.setImageViewResource(R.id.imageView, R.mipmap.ic_launcher_round);
+            customView.setTextViewText(R.id.timeView, String.valueOf(time) + ":00");
+
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                builder = new Notification.Builder(content, "notif");
+            } else {
+                builder = new Notification.Builder(content);
+            }
+            // 後日設定
+            builder.setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setContent(customView)
+                    .setWhen(System.currentTimeMillis())
+                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .setAutoCancel(true)
+                    // .setSound()
+                    .setContentIntent(contentIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                builder.setCustomBigContentView(customView);
+            }
+
+            notif.notify(1, builder.build());
+
+            am.alarmRegister("zihou", 0, 0, "");
         }
 
-        Intent bootIntent = new Intent(content, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(content, 1, bootIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        else {
+            Dialog dialog = new Dialog(content);
 
-        Notification.Builder builder;
-
-
-        RemoteViews customView = new RemoteViews(content.getPackageName(), R.layout.notiflayout);
-        customView.setTextViewText(R.id.messageView, contentText);
-        customView.setImageViewResource(R.id.imageView, R.mipmap.ic_launcher_round);
-        customView.setTextViewText(R.id.timeView, String.valueOf(time) + ":00");
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder = new Notification.Builder(content, "notif");
-        } else {
-            builder = new Notification.Builder(content);
         }
-        // 後日設定
-        builder.setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContent(customView)
-                .setWhen(System.currentTimeMillis())
-                .setPriority(Notification.PRIORITY_DEFAULT)
-                .setAutoCancel(true)
-                // .setSound()
-                .setContentIntent(contentIntent);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            builder.setCustomBigContentView(customView);
-        }
-
-        notif.notify(1, builder.build());
-
-        am.alarmRegister();
-
     }
 }
