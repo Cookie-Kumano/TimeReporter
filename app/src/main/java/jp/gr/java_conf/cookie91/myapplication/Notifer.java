@@ -10,9 +10,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import java.util.Random;
 
@@ -37,6 +40,7 @@ public class Notifer extends BroadcastReceiver {
             int charID = r.nextInt(cd.timereps.size());
 
             String contentText = cd.contentText(time, charID);
+            int notifSoundUri = cd.notifSoundUri(time, charID);
 
 
             NotificationManager notif = (NotificationManager) content.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -72,7 +76,6 @@ public class Notifer extends BroadcastReceiver {
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
                     .setAutoCancel(true)
-                    // .setSound()
                     .setContentIntent(contentIntent);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 builder.setCustomBigContentView(customView);
@@ -80,11 +83,20 @@ public class Notifer extends BroadcastReceiver {
 
             notif.notify(1, builder.build());
 
+            MediaPlayer mediaPlayer = MediaPlayer.create(content, notifSoundUri);
+            mediaPlayer.start();
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    mediaPlayer.release();
+                }
+            });
+
             am.alarmRegister("zihou", 0, 0, "");
         }
 
         else {
-            Dialog dialog = new Dialog(content);
+            return;
 
         }
     }

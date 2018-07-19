@@ -16,12 +16,21 @@ public class CharacterData {
         addMessages();
     }
 
-    public String charMessage(int id) {
+    public String charMessage(int id, int random) {
         String res = null;
 
         if (charData.size() > id) {
-            Random r = new Random();
-            res = charData.get(id).message[r.nextInt(4)];
+            res = charData.get(id).message[random];
+        }
+
+        return res;
+    }
+
+    public int charVoice(int id, int random) {
+        int res = 0;
+
+        if (charData.size() > id) {
+            res = charData.get(id).voice_id[random];
         }
 
         return res;
@@ -29,11 +38,15 @@ public class CharacterData {
 
     public String contentText(int time, int charID) {
 
-
-
         String text = timereps.get(charID).message[time];
 
         return text;
+    }
+
+    public int notifSoundUri(int time, int charID) {
+        int uri = timereps.get(charID).sound_uri[time];
+
+        return uri;
     }
 
     class Characters {
@@ -41,21 +54,26 @@ public class CharacterData {
         public final int image_id;
         public final String defaultText;
         public final String[] message;
+        public final int defaultvoice_id;
+        public final int[] voice_id;
 
-        public Characters (String charName, int image_id, String defaultText, String[] message) {
+
+        public Characters (String charName, int image_id, String defaultText, String[] message, int defaultvoice_id, int[] voice_id) {
             this.charName = charName;
             this.image_id = image_id;
             this.defaultText = defaultText;
             this.message = message;
+            this.defaultvoice_id = defaultvoice_id;
+            this.voice_id = voice_id;
 
         }
     }
 
     class TimeRep {
         public final String[] message;
-        public final int sound_uri;
+        public final int[] sound_uri;
 
-        public TimeRep (String[] message, int sound_uri) {
+        public TimeRep (String[] message, int[] sound_uri) {
             this.message = message;
             this.sound_uri = sound_uri;
         }
@@ -71,12 +89,12 @@ public class CharacterData {
 * 05 秋月
 * */
     private void  addCharacter() {
-        Characters id0 = new Characters("熊野", R.drawable.ic_launcher_foreground, "ごきげんよう、わたくしが重巡、熊野ですわ！", Kumano);
-        Characters id1 = new Characters("瑞鳳", R.drawable.ic_launcher_foreground, "瑞鳳です。軽空母ですが、錬度があがれば、正規空母並の活躍をおみせできます。", Zuiho);
-        Characters id2 = new Characters("島風", R.drawable.ic_launcher_foreground, "駆逐艦島風です。スピードなら誰にも負けません。速きこと、島風の如し、です！", Shimakaze);
-        Characters id3 = new Characters("舞風", R.drawable.ic_launcher_foreground, "こんにちは！陽炎型駆逐艦舞風です。暗い雰囲気は苦手です！", Maikaze);
-        Characters id4 = new Characters("神風", R.drawable.ic_launcher_foreground, "待たせたわね、司令官。神風型駆逐艦、一番艦、神風。推参です！\n" + "みんな、いい？ ついてらっしゃい！", Kamikaze);
-        Characters id5 = new Characters("秋月", R.drawable.ic_launcher_foreground, "秋月型防空駆逐艦、一番艦、秋月。\n" + "ここに推参致しました。お任せください！", Akizuki);
+        Characters id0 = new Characters("熊野", R.drawable.ic_launcher_foreground, "ごきげんよう、わたくしが重巡、熊野ですわ！", Kumano, R.raw.kumano_introduction, Kumano_Voice);
+        Characters id1 = new Characters("瑞鳳", R.drawable.ic_launcher_foreground, "瑞鳳です。軽空母ですが、錬度があがれば、正規空母並の活躍をおみせできます。", Zuiho, R.raw.zuiho_introduction, Zuiho_Voice);
+        Characters id2 = new Characters("島風", R.drawable.ic_launcher_foreground, "駆逐艦島風です。スピードなら誰にも負けません。速きこと、島風の如し、です！", Shimakaze, R.raw.shimakaze_introduction, Shimakaze_Voice);
+        Characters id3 = new Characters("舞風", R.drawable.ic_launcher_foreground, "こんにちは！陽炎型駆逐艦舞風です。暗い雰囲気は苦手です！", Maikaze, R.raw.maikaze_introduction, Maikaze_Voice);
+        Characters id4 = new Characters("神風", R.drawable.ic_launcher_foreground, "待たせたわね、司令官。神風型駆逐艦、一番艦、神風。推参です！\n" + "みんな、いい？ ついてらっしゃい！", Kamikaze, R.raw.kamikaze_introduction, Kamikaze_Voice);
+        Characters id5 = new Characters("秋月", R.drawable.ic_launcher_foreground, "秋月型防空駆逐艦、一番艦、秋月。\n" + "ここに推参致しました。お任せください！", Akizuki, R.raw.akizuki_introduction, Akizuki_Voice);
 
         Collections.addAll(charData, id0 ,id1, id2, id3, id4, id5);
 
@@ -84,23 +102,29 @@ public class CharacterData {
     }
 
     private void addMessages() {
-        TimeRep id0 = new TimeRep(Kumano_timerep, R.raw.test);
-        TimeRep id1 = new TimeRep(Zuiho_timerep, R.raw.test);
+        TimeRep id0 = new TimeRep(Kumano_timerep, Kumano_timerep_Voice);
+        TimeRep id1 = new TimeRep(Zuiho_timerep, Zuiho_timerep_Voice);
         // 島風実装されたらこ↑こ↓
-        TimeRep id3 = new TimeRep(Maikaze_timerep, R.raw.test);
-        TimeRep id4 = new TimeRep(Kamikaze_timerep, R.raw.test);
-        TimeRep id5 = new TimeRep(Akizuki_timerep, R.raw.test);
+        TimeRep id3 = new TimeRep(Maikaze_timerep, Maikaze_timerep_Voice);
+        TimeRep id4 = new TimeRep(Kamikaze_timerep, Kamikaze_timerep_Voice);
+        TimeRep id5 = new TimeRep(Akizuki_timerep, Akizuki_timerep_Voice);
 
         Collections.addAll(timereps, id0, id1, id3, id4, id5);
     }
 
 
         String[] Kumano     = {"あら提督、熊野に何かご用？", "今頃ご出勤？\nのろまなのねぇ……", "この熊野に気安く触るなんて、提督も何か勘違いされているのではなくって？", "提督。ま、まぁ…… よ、よくやってるじゃない。\n褒めてあげてもいいのよ。", "ん……んぅぅ……ふぁ……ぁぁぁ……\n" + "わたくし、ちょっと眠くなってきましたわ……"};
+        int[]  Kumano_Voice = {R.raw.kumano_tap_1, R.raw.kumano_tap_2, R.raw.kumano_tap_3, R.raw.kumano_tap_4, R.raw.kumano_idle};
         String[] Zuiho      = {"九九艦爆は、脚が可愛いのよ、脚が。", "彗星は彗星で悪くないんだけれど、\n" + "整備大変なのよー、整備が。", "天山はー…って、あれ？んっ。 提督？\n" + "格納庫まさぐるの止めてくれない？んぅっ。っていうか、邪魔っ", "提督？　あの…私、卵焼きいっぱい焼いたんだけど…食べりゅ？　\n" + "わっ、ほんと？　\n" + "えへへ…よかった。", "近海の索敵や、輸送船団の護衛も、大事よねぇ……\n" + "って、提督ぅ、仕事、しようよぉ"};
+        int[]   Zuiho_Voice = {R.raw.zuiho_tap_1, R.raw.zuiho_tap_2, R.raw.zuiho_tap_3, R.raw.zuiho_tap_4, R.raw.zuiho_idle};
         String[] Shimakaze  = {"なんですかー提督！？", "ｵｩｯ!?", "駆けっこしたいんですか？負けませんよ？", "えっ？提督、走り疲れたの？おっそーい！\n" + "…でも、頑張ったね！", "んぁ？･･･ん、今、連装砲ちゃんとお話したの。ふぅ･･･\n" + "だって退屈なんだもん！"};
+        int[] Shimakaze_Voice = {R.raw.shimakaze_tap_1, R.raw.shimakaze_tap_2, R.raw.shimakaze_tap_3, R.raw.shimakaze_tap_4, R.raw.shimakaze_idle};
         String[] Maikaze    = {"あれー？元気ないぞぅ。", "おはようございます…って今何時？\n" + "まぁいっかぁ！", "おお？提督ノリがいいね、一緒に踊る？", "提督ー、私と一緒に踊ろうよー！", "ねぇ～、踊らないの提督～？"};
+        int[] Maikaze_Voice = {R.raw.maikaze_tap_1, R.raw.maikaze_tap_2, R.raw.maikaze_tap_3, R.raw.maikaze_tap_4, R.raw.maikaze_idle};
         String[] Kamikaze   = {"やめて春風、私そういうのあまり好きじゃないの。\n" + "って、司令官じゃない！ どういうことなの？ 説明して頂戴！", "旧型ですって？ 馬鹿ね。駆逐艦の実力は、スペックじゃないのよ？", "司令官、私を呼んだ？ 準備はできてるわ。", "司令官、疲れてるみたい。\n" + "よし、私がなにか温かい飲み物、淹れてあげる。\n" + "ちょっと待ってて。はい、お待ちどうさま。\n" + "どう、温まる？ ホントに？ よかったぁ♪", "第一駆逐艦？ ああ……昔はそんな風にも呼ばれたときもあったけど。\n" + "神風よ、神風！ ネームシップなんだから、しっかり覚えてよね！"};
+        int[] Kamikaze_Voice = {R.raw.kamikaze_tap_1, R.raw.kamikaze_tap_2, R.raw.kamikaze_tap_3, R.raw.kamikaze_tap_4, R.raw.kamikaze_idle};
         String[] Akizuki    = {"秋月、推参します！", "この秋月の長10cm砲と高射装置\n" + "この力で、艦隊をきっとお守りします！", "長10cm砲ちゃん、あんまり暴れないでぇ！\n" + "あら、あらら？ 提…督？ ああっ、失礼致しました！", "司令、いつもお疲れ様です。\n" + "この秋月が、艦隊と司令をお護りします。\n" + "だ、大丈夫！", "長10cmよし、高射装置よし、酸素魚雷、よし……よし！\n" + "万全ね、大丈夫！ えっと、あとは……。"};
+        int[] Akizuki_Voice = {R.raw.akizuki_tap_1, R.raw.akizuki_tap_2, R.raw.akizuki_tap_3, R.raw.akizuki_tap_4, R.raw.akizuki_idle};
 
         String[] Kumano_timerep = {
                 "深夜0時ですわ。",
@@ -127,6 +151,33 @@ public class CharacterData {
                 "22時。私、美容のため仮眠いただきますわ。",
                 "23時です、提督。夜はこれから、どうされるのかしら。",
         };
+        int[] Kumano_timerep_Voice = {
+                R.raw.kumano_timerep_00,
+                R.raw.kumano_timerep_01,
+                R.raw.kumano_timerep_02,
+                R.raw.kumano_timerep_03,
+                R.raw.kumano_timerep_04,
+                R.raw.kumano_timerep_05,
+                R.raw.kumano_timerep_06,
+                R.raw.kumano_timerep_07,
+                R.raw.kumano_timerep_08,
+                R.raw.kumano_timerep_09,
+                R.raw.kumano_timerep_10,
+                R.raw.kumano_timerep_11,
+                R.raw.kumano_timerep_12,
+                R.raw.kumano_timerep_13,
+                R.raw.kumano_timerep_14,
+                R.raw.kumano_timerep_15,
+                R.raw.kumano_timerep_16,
+                R.raw.kumano_timerep_17,
+                R.raw.kumano_timerep_18,
+                R.raw.kumano_timerep_19,
+                R.raw.kumano_timerep_20,
+                R.raw.kumano_timerep_21,
+                R.raw.kumano_timerep_22,
+                R.raw.kumano_timerep_23
+        };
+
         String[] Zuiho_timerep = {
                 "日付が変わったよ、提督。",
                 "現在時刻、〇一〇〇",
@@ -153,6 +204,33 @@ public class CharacterData {
                 "提督、二二〇〇です。今日も疲れたねぇ。え？疲れてないのぉ？",
                 "現在時刻、二三〇〇。ふぁぁぁ…早く寝て、早く起きようよ…",
         };
+        int[] Zuiho_timerep_Voice = {
+                R.raw.zuiho_timerep_00,
+                R.raw.zuiho_timerep_01,
+                R.raw.zuiho_timerep_02,
+                R.raw.zuiho_timerep_03,
+                R.raw.zuiho_timerep_04,
+                R.raw.zuiho_timerep_05,
+                R.raw.zuiho_timerep_06,
+                R.raw.zuiho_timerep_07,
+                R.raw.zuiho_timerep_08,
+                R.raw.zuiho_timerep_09,
+                R.raw.zuiho_timerep_10,
+                R.raw.zuiho_timerep_11,
+                R.raw.zuiho_timerep_12,
+                R.raw.zuiho_timerep_13,
+                R.raw.zuiho_timerep_14,
+                R.raw.zuiho_timerep_15,
+                R.raw.zuiho_timerep_16,
+                R.raw.zuiho_timerep_17,
+                R.raw.zuiho_timerep_18,
+                R.raw.zuiho_timerep_19,
+                R.raw.zuiho_timerep_20,
+                R.raw.zuiho_timerep_21,
+                R.raw.zuiho_timerep_22,
+                R.raw.zuiho_timerep_23
+        };
+
         // 島風実装されたらこ↑こ↓
         String[] Maikaze_timerep = {
                 "午前0時、日付が変わりました",
@@ -179,6 +257,33 @@ public class CharacterData {
                 "舞風が9時をお知らせします。そろそろ夜戦の時間ね。",
                 "午後10時です。夜のダンスタイムですね。夜戦にいきます？",
                 "午後11時になりました。提督、そろそろ休まなくて大丈夫～？"};
+        int[] Maikaze_timerep_Voice = {
+                R.raw.maikaze_timerep_00,
+                R.raw.maikaze_timerep_01,
+                R.raw.maikaze_timerep_02,
+                R.raw.maikaze_timerep_03,
+                R.raw.maikaze_timerep_04,
+                R.raw.maikaze_timerep_05,
+                R.raw.maikaze_timerep_06,
+                R.raw.maikaze_timerep_07,
+                R.raw.maikaze_timerep_08,
+                R.raw.maikaze_timerep_09,
+                R.raw.maikaze_timerep_10,
+                R.raw.maikaze_timerep_11,
+                R.raw.maikaze_timerep_12,
+                R.raw.maikaze_timerep_13,
+                R.raw.maikaze_timerep_14,
+                R.raw.maikaze_timerep_15,
+                R.raw.maikaze_timerep_16,
+                R.raw.maikaze_timerep_17,
+                R.raw.maikaze_timerep_18,
+                R.raw.maikaze_timerep_19,
+                R.raw.maikaze_timerep_20,
+                R.raw.maikaze_timerep_21,
+                R.raw.maikaze_timerep_22,
+                R.raw.maikaze_timerep_23
+        };
+
         String[] Kamikaze_timerep = {
                 "よし！今日は私が秘書艦として、司令官のお世話をしっかりしてあげる。いいでしょ？ 丁度、深夜零時。時報も任せておいて。",
                 "〇一〇〇。ふわぁ～…少し眠いわね。でも、大丈夫。任せておいて。",
@@ -205,6 +310,33 @@ public class CharacterData {
                 "二二〇〇。えっ、司令官…なに？ 怖いものは何って？ うーん…船団護衛で怖いのはやっぱり潜水艦…かな。 えっ、嘘だろって？",
                 "二三〇〇。そんなことない、潜水艦は怖いですよ。もちろん敵機も怖いです。 夜？ 海の上での夜は、別に怖くはないです。"
         };
+        int[] Kamikaze_timerep_Voice = {
+                R.raw.kamikaze_timerep_00,
+                R.raw.kamikaze_timerep_01,
+                R.raw.kamikaze_timerep_02,
+                R.raw.kamikaze_timerep_03,
+                R.raw.kamikaze_timerep_04,
+                R.raw.kamikaze_timerep_05,
+                R.raw.kamikaze_timerep_06,
+                R.raw.kamikaze_timerep_07,
+                R.raw.kamikaze_timerep_08,
+                R.raw.kamikaze_timerep_09,
+                R.raw.kamikaze_timerep_10,
+                R.raw.kamikaze_timerep_11,
+                R.raw.kamikaze_timerep_12,
+                R.raw.kamikaze_timerep_13,
+                R.raw.kamikaze_timerep_14,
+                R.raw.kamikaze_timerep_15,
+                R.raw.kamikaze_timerep_16,
+                R.raw.kamikaze_timerep_17,
+                R.raw.kamikaze_timerep_18,
+                R.raw.kamikaze_timerep_19,
+                R.raw.kamikaze_timerep_20,
+                R.raw.kamikaze_timerep_21,
+                R.raw.kamikaze_timerep_22,
+                R.raw.kamikaze_timerep_23
+        };
+
         String[] Akizuki_timerep = {
                 "司令、この秋月が、時刻を報告します。現在時刻、〇〇〇〇、です！",
                 "〇一〇〇をご報告します。こんな形でよろしいでしょうか、司令？",
@@ -230,6 +362,32 @@ public class CharacterData {
                 "二一〇〇です。え、涼月ですか？　はい、自慢の妹ですよ。ええ！",
                 "二二〇〇。あ、翔鶴さん、瑞鶴さん。お疲れ様です。はい、大丈夫です！",
                 "二三〇〇。少し、緊張しました。はぁ…司令、本日も大変お疲れ様でした。"
+        };
+        int[] Akizuki_timerep_Voice = {
+                R.raw.akizuki_timerep_00,
+                R.raw.akizuki_timerep_01,
+                R.raw.akizuki_timerep_02,
+                R.raw.akizuki_timerep_03,
+                R.raw.akizuki_timerep_04,
+                R.raw.akizuki_timerep_05,
+                R.raw.akizuki_timerep_06,
+                R.raw.akizuki_timerep_07,
+                R.raw.akizuki_timerep_08,
+                R.raw.akizuki_timerep_09,
+                R.raw.akizuki_timerep_10,
+                R.raw.akizuki_timerep_11,
+                R.raw.akizuki_timerep_12,
+                R.raw.akizuki_timerep_13,
+                R.raw.akizuki_timerep_14,
+                R.raw.akizuki_timerep_15,
+                R.raw.akizuki_timerep_16,
+                R.raw.akizuki_timerep_17,
+                R.raw.akizuki_timerep_18,
+                R.raw.akizuki_timerep_19,
+                R.raw.akizuki_timerep_20,
+                R.raw.akizuki_timerep_21,
+                R.raw.akizuki_timerep_22,
+                R.raw.akizuki_timerep_23
         };
 
 }

@@ -1,15 +1,22 @@
 package jp.gr.java_conf.cookie91.myapplication;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,8 +24,14 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileDescriptor;
+import java.io.IOException;
+import java.util.Random;
+
 
 public class MainActivity extends AppCompatActivity {
+
+    MediaPlayer mediaPlayer = null;
 
     Button setting_button;
     ImageView charImageView;
@@ -31,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView char_3;
     ImageView char_4;
     ImageView char_5;
+
+    Button progress_checker;
 
     public String notif = "true";
     public String houti = "true";
@@ -71,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
         char_4 = (ImageView) findViewById(R.id.char_4);
         char_5 = (ImageView) findViewById(R.id.char_5);
 
+        progress_checker = (Button) findViewById(R.id.progress_checker);
+
+        progress_checker.setEnabled(false);
+
+
+
     }
     @Override
     protected void onResume() {
@@ -78,6 +99,11 @@ public class MainActivity extends AppCompatActivity {
         loadSettings(getApplicationContext());
         loadData(getApplicationContext());
         setData();
+    }
+    @Override
+    protected void onPause(){
+        super.onPause();
+        mediaPlayer.release();
     }
 
     public void onClick(View v) {
@@ -87,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
                 break;
             case R.id.progress_checker:
-                pDialog();
+
                 break;
             case R.id.char_0:
                 charID = char0_id;
@@ -122,10 +148,12 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.charView:
                 charMessageView.setText(null);
-
-                String text = db.charMessage(charID);
+                Random r = new Random();
+                int random = r.nextInt(4);
+                String text = db.charMessage(charID, random);
                 charMessageView.setText(text);
-                // こっちにランダムを持ってきて表情差分
+                int voice_id = db.charVoice(charID, random);
+                voicePlayer(voice_id);
                 break;
         }
     }
@@ -143,8 +171,29 @@ public class MainActivity extends AppCompatActivity {
 
         String message = db.charData.get(charID).defaultText;
         charMessageView.setText(message);
+
+        int voice_id = db.charData.get(charID).defaultvoice_id;
+        voicePlayer(voice_id);
+
     }
 
+    private void voicePlayer(int voice_id) {
+       if (mediaPlayer != null) {
+           mediaPlayer.stop();
+           mediaPlayer.reset();
+           mediaPlayer.release();
+           mediaPlayer = null;
+       }
+       mediaPlayer = MediaPlayer.create(this, voice_id);
+       mediaPlayer.start();
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                mediaPlayer.release();
+            }
+        });
+    }
 
     private void loadSettings(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
@@ -184,13 +233,15 @@ public class MainActivity extends AppCompatActivity {
                // 指定されたボイスを再生
                String message = db.charData.get(charID).message[4];
                charMessageView.setText(message);
+               int voice_id = db.charData.get(charID).voice_id[4];
+               voicePlayer(voice_id);
            }
        }, 300000);
     }
 
     private void pDialog() {
-        Dialog dialog = new Dialog(getApplicationContext());
-        dialog.setContentView(R.layout.setp_dialog);
+        View view = MainActivity.this.getLayoutInflater().inflate(R.layout.setp_dialog, null);
+        AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
 
         final EditText editComment = (EditText)findViewById(R.id.editComment);
         final NumberPicker hourPicker = (NumberPicker)findViewById(R.id.hourPicker);
@@ -198,9 +249,9 @@ public class MainActivity extends AppCompatActivity {
         Button cancel = (Button)findViewById(R.id.cancel);
         Button decision = (Button)findViewById(R.id.decision);
 
-        hourPicker.setMaxValue(24);
+        hourPicker.setMaxValue(23);
         hourPicker.setMinValue(0);
-        minutePicker.setMaxValue(60);
+        minutePicker.setMaxValue(59);
         minutePicker.setMinValue(0);
 
         decision.setOnClickListener(new View.OnClickListener() {
@@ -219,5 +270,9 @@ public class MainActivity extends AppCompatActivity {
                 am.stopAlarm("sintyoku");
             }
         });
+
+        dialog.setView(view)
+              .create().show();
+
     }
 }

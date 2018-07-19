@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">時報アプリ</string>
+    <string name="description_sintyoku">
+        進捗あります･･･設定時間の倍経過後に通知\n
+        進捗ないです･･･設定時間経過後に通知\n
+        解除･･･進捗チェッカーを解除
+    </string>
 </resources>
