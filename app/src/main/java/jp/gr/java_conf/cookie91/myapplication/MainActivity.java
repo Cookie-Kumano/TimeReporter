@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mediaPlayer = null;
         loadSettings(getApplicationContext());
         loadData(getApplicationContext());
         setData();
@@ -179,20 +180,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void voicePlayer(int voice_id) {
        if (mediaPlayer != null) {
-           mediaPlayer.stop();
-           mediaPlayer.reset();
-           mediaPlayer.release();
-           mediaPlayer = null;
+           if (mediaPlayer.isPlaying()) {
+               mediaPlayer.stop();
+               mediaPlayer.reset();
+               mediaPlayer.release();
+               mediaPlayer = null;
+           }
        }
        mediaPlayer = MediaPlayer.create(this, voice_id);
        mediaPlayer.start();
-
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                mediaPlayer.release();
-            }
-        });
     }
 
     private void loadSettings(Context context) {

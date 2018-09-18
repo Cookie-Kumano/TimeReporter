@@ -80,11 +80,13 @@ public class CAlarmManager {
     public void stopAlarm(String status) {
         // status引数でrequestCodeを変えてね。
 
-        Intent indent = new Intent (context, Notifer.class);
-        PendingIntent p = PendingIntent.getBroadcast(context, 0, indent, 0);
+        Intent intent = new Intent (context, Notifer.class);
+        PendingIntent p = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        p.cancel();
         alarmManager.cancel(p);
+
 
         Log.w("CANCEL", "CANCELED");
     }
